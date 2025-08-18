@@ -173,7 +173,7 @@ function App() {
       <FlyingCats />
       <div className="main-content">
         <h1 className="glitter-text">cats</h1>
-        <p className="subtitle">Welcome to the Radical 90s Web Experience!</p>
+        <p className="subtitle">Welcome to cats.com, a radical new internet by cats for cats</p>
         
         <div className="marquee">
           <div className="marquee-text">
@@ -182,8 +182,9 @@ function App() {
         </div>
 
         <div className="welcome-box">
-          <p>🌟 Welcome to my totally awesome homepage! 🌟</p>
-          <p>This site is <span className="blink">OPTIMIZED</span> for 800x600 resolution!</p>
+          <p>🌟 Hi, I'm <span className="blink">Aphaea</span> and I'm Apo<span className="blink">llo</span> and together we are a<sup>3</sup>! 🌟</p>
+          <p> We're so glad that you decided to come hang out with us today </p>
+          <p> Take a look around and check out all of our cool stuff! </p>
         </div>
 
         <div className="retro-grid">
