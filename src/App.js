@@ -198,7 +198,7 @@ function App() {
           <div className="retro-card">
             <img src="/images/apollo_pfp.JPG" alt="aPollo.jpg" className="apollo-card-pfp" />
             <h3>aPollo</h3>
-            <p>🌟 demon. chicken. spawn. cat 🌟</p>
+            <p>🌟 demon. chicken. spawn. cat. bingus 🌟</p>
             <button className="button-90s">Explore</button>
           </div>
         </div>
