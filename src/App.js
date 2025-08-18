@@ -189,14 +189,14 @@ function App() {
 
         <div className="retro-grid">
           <div className="retro-card">
-            <img src="/images/aphaea_pfp.JPG" alt="Aphaea.jpg" className="card-pfp" />
+            <img src="/images/aphaea_pfp.jpg" alt="Aphaea.jpg" className="card-pfp" />
             <h3>Aphaea</h3>
             <p>✨ pwincess ✨</p>
             <button className="button-90s" onClick={handleClick}>Click Here!</button>
           </div>
           
           <div className="retro-card">
-            <img src="/images/apollo_pfp.JPG" alt="aPollo.jpg" className="apollo-card-pfp" />
+            <img src="/images/apollo_pfp.jpg" alt="aPollo.jpg" className="apollo-card-pfp" />
             <h3>aPollo</h3>
             <p>🌟 demon. chicken. spawn. cat. bingus 🌟</p>
             <button className="button-90s">Explore</button>
