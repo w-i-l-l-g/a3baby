@@ -2,15 +2,73 @@ import './App.css';
 import { useState, useEffect } from 'react';
 
 // Flying Cats Component
+// Component for cats that randomly pop up in the welcome box corner
+function PopupCats() {
+  const [currentCat, setCurrentCat] = useState(null);
+  
+  const popupCats = [
+    {
+      src: '/images/cat2.png',
+      position: { bottom: '-15px', left: '-3px' },
+      size: { height: '110%', width: 'auto' }
+    },
+    {
+      src: '/images/cat3.png', 
+      position: { bottom: '-12px', left: '-9px' },
+      size: { height: '90%', width: 'auto' }
+    }
+  ];
+  
+  useEffect(() => {
+    const showRandomCat = () => {
+      // Random delay between appearances (3-8 seconds)
+      const delay = 1000 + Math.random() * 3500;
+      
+      setTimeout(() => {
+        // Pick a random cat
+        const randomCatIndex = Math.floor(Math.random() * popupCats.length);
+        const randomCat = popupCats[randomCatIndex];
+        setCurrentCat(randomCat);
+        
+        // Show for random duration (2-5 seconds)
+        const showDuration = 1000 + Math.random() * 3500;
+        
+        setTimeout(() => {
+          setCurrentCat(null);
+          showRandomCat(); // Schedule next appearance
+        }, showDuration);
+      }, delay);
+    };
+    
+    showRandomCat(); // Start the cycle
+  }, []);
+  
+  return (
+    currentCat && (
+      <img
+        src={currentCat.src}
+        alt="Popup cat"
+        className="popup-cat"
+        style={{
+          position: 'absolute',
+          bottom: currentCat.position.bottom,
+          left: currentCat.position.left,
+          width: currentCat.size.width,
+          height: currentCat.size.height,
+          zIndex: 1001,
+        }}
+      />
+    )
+  );
+}
+
 function FlyingCats() {
   const [cats, setCats] = useState([]);
   const [trailParticles, setTrailParticles] = useState([]);
   
-  // Define cat images outside of useEffect to avoid dependency issues
+  // Only cat1.png and cat4.png fly around
   const catImages = [
     '/images/cat1.png',
-    '/images/cat2.png',
-    '/images/cat3.png',
     '/images/cat4.png'
   ];
 
@@ -23,8 +81,8 @@ function FlyingCats() {
       y: Math.random() * window.innerHeight,
       vx: (Math.random() - 0.5) * 4, // Random velocity x (-2 to 2)
       vy: (Math.random() - 0.5) * 4, // Random velocity y (-2 to 2)
-      rotation: index === 3 ? Math.random() * 90 : 0, // Only cat4.png (index 3) gets initial rotation
-      rotationSpeed: index === 3 ? (Math.random() - 0.5) * 6 : 0, // Only cat4.png rotates
+      rotation: index === 1 ? Math.random() * 90 : 0, // Only cat4.png (index 1 now) gets initial rotation
+      rotationSpeed: index === 1 ? (Math.random() - 0.5) * 6 : 0, // Only cat4.png rotates
       scale: 0.8 + Math.random() * 0.9 // Random size between 0.3 and 0.7
     }));
     
@@ -57,7 +115,7 @@ function FlyingCats() {
             y: newY,
             vx: newVx,
             vy: newVy,
-            rotation: cat.id === 3 ? cat.rotation + cat.rotationSpeed : cat.rotation // Only cat4.png (id 3) rotates
+            rotation: cat.id === 1 ? cat.rotation + cat.rotationSpeed : cat.rotation // Only cat4.png (id 1 now) rotates
           };
         })
       );
@@ -173,7 +231,7 @@ function App() {
       <FlyingCats />
       <div className="main-content">
         <h1 className="glitter-text">cats</h1>
-        <p className="subtitle">Welcome to cats.com, a radical new internet by cats for cats</p>
+        <p className="subtitle">Welcome to cats.com, a radical new way to internet by cats for cats</p>
         
         <div className="marquee">
           <div className="marquee-text">
@@ -181,8 +239,9 @@ function App() {
           </div>
         </div>
 
-        <div className="welcome-box">
-          <p>🌟 Hi, I'm <span className="blink">Aphaea</span> and I'm Apo<span className="blink">llo</span> and together we are a<sup>3</sup>! 🌟</p>
+        <div className="welcome-box" style={{ position: 'relative' }}>
+          <PopupCats />
+          <p>🌟 Hi, I'm <span className="blink">Aphaea</span> and I'm Apol<span className="blink">lo</span> and together we are a<sup>3</sup>! 🌟</p>
           <p> We're so glad that you decided to come hang out with us today </p>
           <p> Take a look around and check out all of our cool stuff! </p>
         </div>
