@@ -231,7 +231,7 @@ function App() {
       <FlyingCats />
       <div className="main-content">
         <h1 className="glitter-text">cats</h1>
-        <p className="subtitle">Welcome to cats.com, a radical new way to internet by cats for cats</p>
+        <p className="subtitle">Welcome to cats.com, a radical new way to internet, for cats by cats</p>
         
         <div className="marquee">
           <div className="marquee-text">
@@ -243,7 +243,7 @@ function App() {
           <PopupCats />
           <p>🌟 Hi, I'm <span className="blink">Aphaea</span> and I'm Apol<span className="blink">lo</span> and together we are a<sup>3</sup>! 🌟</p>
           <p> We're so glad that you decided to come hang out with us today </p>
-          <p> Take a look around and check out all of our cool stuff! </p>
+          <p> Take a look around and check out how cute we are! </p>
         </div>
 
         <div className="retro-grid">
@@ -270,7 +270,7 @@ function App() {
         <div className="under-construction">
           🚧 This site is under construction! 🚧
           <br />
-          Please excuse the mess while I add more cool stuff!
+          Please excuse the mess while the cats are blogging and sleeping!
         </div>
 
         <div className="visitor-counter">
