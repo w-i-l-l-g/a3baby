@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // Flying Cats Component
 // Component for cats that randomly pop up in the welcome box corner
@@ -333,10 +333,42 @@ function TalkToCatsForm({ onBack }) {
 }
 
 function App() {
-  const [visitorCount, setVisitorCount] = useState(1337);
+  const [visitorCount, setVisitorCount] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showForm, setShowForm] = useState(false);
+  const [isLoadingCount, setIsLoadingCount] = useState(true);
+  const hasCalledApi = useRef(false);
 
+  // Fetch visitor count from the API - prevent double calls
+  useEffect(() => {
+    // Skip if we've already called the API
+    if (hasCalledApi.current) return;
+    
+    const fetchVisitorCount = async () => {
+      setIsLoadingCount(true);
+      try {
+        // Set flag before making API call to prevent duplicates
+        hasCalledApi.current = true;
+        
+        const response = await fetch('https://lh2vv3uioi2cslc4upbynarrlm0oqwtj.lambda-url.us-east-1.on.aws/');
+        if (!response.ok) {
+          throw new Error('Failed to fetch visitor count');
+        }
+        const data = await response.json();
+        // If the real count is less than 1000, display 1018 instead
+        setVisitorCount(data.count < 1000 ? 1018 : data.count);
+      } catch (error) {
+        console.error('Error fetching visitor count:', error);
+        setVisitorCount(1337); // Fallback count in case of error
+      } finally {
+        setIsLoadingCount(false);
+      }
+    };
+
+    fetchVisitorCount();
+  }, []);
+  
+  // Update time every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -385,7 +417,7 @@ function App() {
               <img src="/images/aphaea_pfp.jpg" alt="Aphaea.jpg" className="card-pfp" />
               <h3>Aphaea</h3>
               <p>✨ pwincess ✨</p>
-              <button className="button-90s" onClick={handleClick}>Click Here!</button>
+              <button className="button-90s" onClick={handleClick}>Click Me!</button>
             </div>
             
             <div className="retro-card">
@@ -408,7 +440,11 @@ function App() {
           </div>
 
           <div className="visitor-counter">
-            You are visitor #{visitorCount.toLocaleString()}
+            {isLoadingCount ? (
+              <span className="blink">Loading visitor count...</span>
+            ) : (
+              <>You are visitor #{visitorCount.toLocaleString()}</>
+            )}
             <br />
             Current time: {currentTime.toLocaleTimeString()}
           </div>
