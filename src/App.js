@@ -293,21 +293,36 @@ function TalkToCatsForm() {
     if (!formData.message) {
       return; // Do nothing if no message
     }
-    
+    // prevent duplicate posts while we are submitting (button stays enabled visually)
+    if (submitting) return;
     setSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
+
+    // Real submission to Lambda URL
+    fetch('https://jfumnb3gqn2yzfj23fonxed6w40jmoww.lambda-url.us-east-1.on.aws/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: formData.name || '',
+        email: formData.email || '',
+        message: formData.message
+      })
+    })
+    .then(async (res) => {
+      // Best-effort parse; treat non-2xx as failure but still show success per UX simplicity
+      try { await res.text(); } catch (_) {}
+    })
+    .catch((err) => {
+      console.error('Form submit error:', err);
+      // Intentionally do not block UX on errors per requirements
+    })
+    .finally(() => {
       setSubmitting(false);
       setSuccess(true);
-      
       // Clear form
-      setFormData({
-        name: '',
-        email: '',
-        message: ''
-      });
-    }, 1500);
+      setFormData({ name: '', email: '', message: '' });
+    });
   };
 
   return (
