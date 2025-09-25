@@ -1,5 +1,6 @@
 import './App.css';
 import { useState, useEffect, useRef } from 'react';
+import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 
 // Flying Cats Component
 // Component for cats that randomly pop up in the welcome box corner
@@ -332,12 +333,80 @@ function TalkToCatsForm({ onBack }) {
   );
 }
 
+function HomePage({ visitorCount, currentTime, isLoadingCount, handleClick }) {
+  const navigate = useNavigate();
+  
+  return (
+    <div className="main-content">
+      <h1 className="glitter-text">cats</h1>
+      <p className="subtitle">Welcome to cats.com, a radical new way to internet, for cats by cats</p>
+      
+      <div className="marquee">
+        <div className="marquee-text">
+          ★ ☆ ★ meow ★ ☆ ★ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; meow. meow
+        </div>
+      </div>
+
+      <div className="welcome-box" style={{ position: 'relative' }}>
+        <PopupCats />
+        <p>🌟 Hi, I'm <span className="blink">Aphaea</span> and I'm Apol<span className="blink">lo</span> and together we are a<sup>3</sup>! 🌟</p>
+        <p> We're so glad that you decided to come hang out with us today </p>
+        <p> Take a look around and check out how cute we are! </p>
+      </div>
+
+      <div className="retro-grid">
+        <div className="retro-card">
+          <img src="/images/aphaea_pfp.jpg" alt="Aphaea.jpg" className="card-pfp" />
+          <h3>Aphaea</h3>
+          <p>✨ pwincess ✨</p>
+          <button className="button-90s" onClick={handleClick}>Click Me!</button>
+        </div>
+        
+        <div className="retro-card">
+          <img src="/images/apollo_pfp.jpg" alt="aPollo.jpg" className="apollo-card-pfp" />
+          <h3>aPollo</h3>
+          <p>🌟 demon. chicken. spawn. cat. bingus 🌟</p>
+          <button className="button-90s">Explore</button>
+        </div>
+      </div>
+
+      <div className="pixel-border">
+        <h3>🎵 Now Playing: Darude - Sandstorm 🎵</h3>
+        <p>Turn up your speakers for the full experience!</p>
+      </div>
+
+      <div className="under-construction">
+        🚧 This site is under construction! 🚧
+        <br />
+        Please excuse the mess while the cats are blogging and sleeping!
+      </div>
+
+      <div className="visitor-counter">
+        {isLoadingCount ? (
+          <span className="blink">Loading visitor count...</span>
+        ) : (
+          <>You are visitor #{visitorCount.toLocaleString()}</>
+        )}
+        <br />
+        Current time: {currentTime.toLocaleTimeString()}
+      </div>
+
+      <p style={{fontSize: '12px', color: '#666'}}>
+        Best viewed with Internet Explorer 4.0+ | 
+        <span className="blink">NEW!</span> JavaScript enabled | 
+        Made with ❤️ and HTML
+      </p>
+    </div>
+  );
+}
+
 function App() {
   const [visitorCount, setVisitorCount] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [showForm, setShowForm] = useState(false);
   const [isLoadingCount, setIsLoadingCount] = useState(true);
   const hasCalledApi = useRef(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Fetch visitor count from the API - prevent double calls
   useEffect(() => {
@@ -379,83 +448,19 @@ function App() {
   const handleClick = () => {
     setVisitorCount(prev => prev + 1);
   };
-  
-  const toggleForm = () => {
-    setShowForm(prev => !prev);
-  };
 
   return (
     <div className="App">
       <FlyingCats />
-      {!showForm && (
+      {location.pathname !== '/sayhi' && (
         <div className="corner-nav">
-          <a href="#" className="talk-cats-link" onClick={(e) => { e.preventDefault(); toggleForm(); }}>talk to cats</a>
+          <Link to="/sayhi" className="talk-cats-link">talk to cats</Link>
         </div>
       )}
-      {showForm ? (
-        <TalkToCatsForm onBack={toggleForm} />
-      ) : (
-        <div className="main-content">
-          <h1 className="glitter-text">cats</h1>
-          <p className="subtitle">Welcome to cats.com, a radical new way to internet, for cats by cats</p>
-          
-          <div className="marquee">
-            <div className="marquee-text">
-              ★ ☆ ★ meow ★ ☆ ★ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; meow. meow
-            </div>
-          </div>
-
-          <div className="welcome-box" style={{ position: 'relative' }}>
-            <PopupCats />
-            <p>🌟 Hi, I'm <span className="blink">Aphaea</span> and I'm Apol<span className="blink">lo</span> and together we are a<sup>3</sup>! 🌟</p>
-            <p> We're so glad that you decided to come hang out with us today </p>
-            <p> Take a look around and check out how cute we are! </p>
-          </div>
-
-          <div className="retro-grid">
-            <div className="retro-card">
-              <img src="/images/aphaea_pfp.jpg" alt="Aphaea.jpg" className="card-pfp" />
-              <h3>Aphaea</h3>
-              <p>✨ pwincess ✨</p>
-              <button className="button-90s" onClick={handleClick}>Click Me!</button>
-            </div>
-            
-            <div className="retro-card">
-              <img src="/images/apollo_pfp.jpg" alt="aPollo.jpg" className="apollo-card-pfp" />
-              <h3>aPollo</h3>
-              <p>🌟 demon. chicken. spawn. cat. bingus 🌟</p>
-              <button className="button-90s">Explore</button>
-            </div>
-          </div>
-
-          <div className="pixel-border">
-            <h3>🎵 Now Playing: Darude - Sandstorm 🎵</h3>
-            <p>Turn up your speakers for the full experience!</p>
-          </div>
-
-          <div className="under-construction">
-            🚧 This site is under construction! 🚧
-            <br />
-            Please excuse the mess while the cats are blogging and sleeping!
-          </div>
-
-          <div className="visitor-counter">
-            {isLoadingCount ? (
-              <span className="blink">Loading visitor count...</span>
-            ) : (
-              <>You are visitor #{visitorCount.toLocaleString()}</>
-            )}
-            <br />
-            Current time: {currentTime.toLocaleTimeString()}
-          </div>
-
-          <p style={{fontSize: '12px', color: '#666'}}>
-            Best viewed with Internet Explorer 4.0+ | 
-            <span className="blink">NEW!</span> JavaScript enabled | 
-            Made with ❤️ and HTML
-          </p>
-        </div>
-      )}
+      <Routes>
+        <Route path="/sayhi" element={<TalkToCatsForm onBack={() => navigate('/')} />} />
+        <Route path="/" element={<HomePage visitorCount={visitorCount} currentTime={currentTime} isLoadingCount={isLoadingCount} handleClick={handleClick} />} />
+      </Routes>
     </div>
   );
 }
