@@ -371,7 +371,7 @@ h1 {
 
 .talk-cats-link:hover {
   color: white;
-  transform: rotate(2deg) scale(1.05);
+  transform: scale(1.03);
   box-shadow: 0 0 15px rgba(255, 105, 180, 1.0),
               inset 0 0 10px rgba(255, 255, 255, 0.8);
   animation: sparkleLink 0.5s infinite alternate;

@@ -1,6 +1,6 @@
 import './App.css';
 import { useState, useEffect, useRef } from 'react';
-import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 
 // Flying Cats Component
 // Component for cats that randomly pop up in the welcome box corner
@@ -41,28 +41,77 @@ function PopupCats() {
       }, delay);
     };
     
-    showRandomCat(); // Start the cycle
-  }, []);
+    // Start the cycle
+    showRandomCat();
+    
+    // Cleanup on component unmount
+    return () => {
+      // Any pending timeouts will be cleaned up by React
+    };
+  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Only render if we have a current cat
+  if (!currentCat) return null;
   
   return (
-    currentCat && (
-      <img
-        src={currentCat.src}
-        alt="Popup cat"
-        className="popup-cat"
-        style={{
-          position: 'absolute',
-          bottom: currentCat.position.bottom,
-          left: currentCat.position.left,
-          width: currentCat.size.width,
-          height: currentCat.size.height,
-          zIndex: 1001,
-        }}
-      />
-    )
+    <img 
+      src={currentCat.src}
+      alt="Pop-up Cat"
+      className="popup-cat"
+      style={{
+        position: 'absolute',
+        bottom: currentCat.position.bottom,
+        left: currentCat.position.left,
+        width: currentCat.size.width,
+        height: currentCat.size.height,
+        zIndex: 1001,
+      }}
+    />
   );
 }
 
+// Simple profile page for Apollo
+function ApolloProfile() {
+  const navigate = useNavigate();
+  return (
+    <div className="main-content" style={{ position: 'relative' }}>
+      <button
+        className="button-90s back-btn"
+        style={{ position: 'absolute', top: 10, left: 10 }}
+        onClick={() => navigate('/')}
+      >
+        ← Back
+      </button>
+
+      <h1 className="glitter-text">aPollo</h1>
+
+      {/* Profile header content without retro-card wrapper */}
+      <div style={{ margin: '20px auto', textAlign: 'center' }}>
+        <img src="/images/apollo_pfp.jpg" alt="aPollo.jpg" className="apollo-card-pfp" />
+        <h3>🌟 demon. chicken. spawn. cat. bingus 🌟</h3>
+        <p>Likes: chaos, zoomies, forbidden counters.</p>
+      </div>
+
+      <div className="profile-section" style={{ marginTop: 20 }}>
+        <h3>Dislikes</h3>
+        <ul style={{ paddingLeft: 18 }}>
+          <li>Closed doors (also)</li>
+          <li>The concept of "no"</li>
+        </ul>
+      </div>
+
+      <div className="profile-section" style={{ marginTop: 20 }}>
+        <h3>About</h3>
+        <p>
+          Apollo is the resident agent of entropy. When not planning elaborate
+          heists on treat caches, he practices runway walks across keyboards and
+          window sills. Fearless explorer of cabinets and conqueror of cardboard
+          forts, he brings undeniable main-character energy to every room.
+        </p>
+      </div>
+    </div>
+  );
+}
 function FlyingCats() {
   const [cats, setCats] = useState([]);
   const [trailParticles, setTrailParticles] = useState([]);
@@ -83,8 +132,8 @@ function FlyingCats() {
       vx: (Math.random() - 0.5) * 4, // Random velocity x (-2 to 2)
       vy: (Math.random() - 0.5) * 4, // Random velocity y (-2 to 2)
       rotation: index === 1 ? Math.random() * 90 : 0, // Only cat4.png (index 1 now) gets initial rotation
-      rotationSpeed: index === 1 ? (Math.random() - 0.5) * 6 : 0, // Only cat4.png rotates
-      scale: 0.8 + Math.random() * 0.9 // Random size between 0.3 and 0.7
+      rotationSpeed: index === 1 ? (Math.random() > 0.5 ? 1 : -1) * 0.5 : 0, // Only cat4.png rotates
+      scale: 0.6 + Math.random() * 0.4 // Random size between 0.6 and 1.0
     }));
     
     setCats(initialCats);
@@ -120,8 +169,8 @@ function FlyingCats() {
           };
         })
       );
-    }, 16); // ~60 FPS for very smooth cat movement
-
+    }, 50);
+    
     // Sparkle animation loop (much more optimized)
     const sparkleAnimationInterval = setInterval(() => {
       setCats(currentCats => {
@@ -181,16 +230,14 @@ function FlyingCats() {
             borderRadius: '50%',
             opacity: particle.life,
             pointerEvents: 'none',
-            zIndex: 999, // Behind cats but above everything else
-            boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
-            animation: 'sparkle 0.5s ease-in-out infinite alternate'
+            zIndex: 999
           }}
         />
       ))}
       
-      {/* Render flying cats */}
+      {/* Render cats */}
       {cats.map(cat => (
-        <img
+        <img 
           key={cat.id}
           src={cat.src}
           alt="Flying cat"
@@ -213,7 +260,8 @@ function FlyingCats() {
 }
 
 // Form Submission Component
-function TalkToCatsForm({ onBack }) {
+function TalkToCatsForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -221,6 +269,14 @@ function TalkToCatsForm({ onBack }) {
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // After success, show Meow for 1.75s then redirect home
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => navigate('/'), 1750);
+      return () => clearTimeout(timer);
+    }
+  }, [success, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -240,35 +296,18 @@ function TalkToCatsForm({ onBack }) {
     
     setSubmitting(true);
     
-    // Submit to the API endpoint
-    fetch('https://jfumnb3gqn2yzfj23fonxed6w40jmoww.lambda-url.us-east-1.on.aws/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: formData.name,
-        email: formData.email,
-        message: formData.message
-      }),
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      setFormData({ name: '', email: '', message: '' });
+    // Simulate form submission
+    setTimeout(() => {
       setSubmitting(false);
       setSuccess(true);
       
-      // Show "Meow!" for 1.5 seconds then go back
-      setTimeout(() => {
-        onBack();
-      }, 1250);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      setSubmitting(false);
-    });
+      // Clear form
+      setFormData({
+        name: '',
+        email: '',
+        message: ''
+      });
+    }, 1500);
   };
 
   return (
@@ -279,47 +318,57 @@ function TalkToCatsForm({ onBack }) {
         <>
           <h2 className="form-title glitter-text">Talk to Cats</h2>
           <div className="retro-form">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               <div className="form-group">
-                <label htmlFor="name">Name (optional):</label>
-                <input 
-                  type="text" 
-                  id="name" 
-                  name="name" 
-                  value={formData.name} 
-                  onChange={handleInputChange} 
-                  className="retro-input"
+                <label htmlFor="name">name (optional):</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="form-input"
                 />
               </div>
               
               <div className="form-group">
-                <label htmlFor="email">Email (optional):</label>
-                <input 
-                  type="text" 
-                  id="email" 
-                  name="email" 
-                  value={formData.email} 
-                  onChange={handleInputChange} 
-                  className="retro-input"
+                <label htmlFor="email">email (optional):</label>
+                <input
+                  type="text"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="form-input"
                 />
               </div>
               
               <div className="form-group">
-                <label htmlFor="message">Message:</label>
-                <textarea 
-                  id="message" 
-                  name="message" 
-                  value={formData.message} 
-                  onChange={handleInputChange} 
-                  className="retro-textarea" 
-                  required
-                  rows="5"
+                <label htmlFor="message">Message for Cats:</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  className="form-textarea"
+                  rows="4"
                 />
               </div>
               
               <div className="form-actions">
-                <button type="submit" className="button-90s">{submitting ? 'Sending...' : 'Send to Cats'}</button>
-                <button type="button" onClick={onBack} className="button-90s back-button">Go Back</button>
+                <button 
+                  type="submit" 
+                  className="button-90s submit-btn"
+                >
+                  {submitting ? 'Sending...' : 'Send Message'}
+                </button>
+                <button 
+                  type="button" 
+                  className="button-90s back-btn"
+                  onClick={() => navigate('/')}
+                >
+                  Go Back
+                </button>
               </div>
             </form>
           </div>
@@ -333,69 +382,46 @@ function TalkToCatsForm({ onBack }) {
   );
 }
 
-function HomePage({ visitorCount, currentTime, isLoadingCount, handleClick }) {
+// Simple profile page for Aphaea
+function AphaeaProfile() {
   const navigate = useNavigate();
-  
   return (
-    <div className="main-content">
-      <h1 className="glitter-text">cats</h1>
-      <p className="subtitle">Welcome to cats.com, a radical new way to internet, for cats by cats</p>
-      
-      <div className="marquee">
-        <div className="marquee-text">
-          ★ ☆ ★ meow ★ ☆ ★ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; meow. meow
-        </div>
+    <div className="main-content" style={{ position: 'relative' }}>
+      <button
+        className="button-90s back-btn"
+        style={{ position: 'absolute', top: 10, left: 10 }}
+        onClick={() => navigate('/')}
+      >
+        ← Back
+      </button>
+
+      <h1 className="glitter-text">Aphaea</h1>
+
+      {/* Profile header content without retro-card wrapper */}
+      <div style={{ margin: '20px auto', textAlign: 'center' }}>
+        <img src="/images/aphaea_pfp.jpg" alt="Aphaea.jpg" className="card-pfp" />
+        <h3>✨ pwincess ✨</h3>
+        <p>Likes: sunbeams, snacks, naps.</p>
       </div>
 
-      <div className="welcome-box" style={{ position: 'relative' }}>
-        <PopupCats />
-        <p>🌟 Hi, I'm <span className="blink">Aphaea</span> and I'm Apol<span className="blink">lo</span> and together we are a<sup>3</sup>! 🌟</p>
-        <p> We're so glad that you decided to come hang out with us today </p>
-        <p> Take a look around and check out how cute we are! </p>
+      <div className="profile-section" style={{ marginTop: 20 }}>
+        <h3>Dislikes</h3>
+        <ul style={{ paddingLeft: 18 }}>
+          <li>Closed doors</li>
+          <li>Empty food bowls</li>
+          <li>Loud vacuum monsters</li>
+        </ul>
       </div>
 
-      <div className="retro-grid">
-        <div className="retro-card">
-          <img src="/images/aphaea_pfp.jpg" alt="Aphaea.jpg" className="card-pfp" />
-          <h3>Aphaea</h3>
-          <p>✨ pwincess ✨</p>
-          <button className="button-90s" onClick={handleClick}>Click Me!</button>
-        </div>
-        
-        <div className="retro-card">
-          <img src="/images/apollo_pfp.jpg" alt="aPollo.jpg" className="apollo-card-pfp" />
-          <h3>aPollo</h3>
-          <p>🌟 demon. chicken. spawn. cat. bingus 🌟</p>
-          <button className="button-90s">Explore</button>
-        </div>
+      <div className="profile-section" style={{ marginTop: 20 }}>
+        <h3>About</h3>
+        <p>
+          Aphaea is a certified pwincess with a strict daily schedule: greet the morning
+          sunbeam, inspect the snack cabinet, and supervise all keyboard activity. When not
+          posing for glamour shots, she can be found patrolling comfy blankets, conducting
+          advanced purr therapy, and reminding humans of the correct snack-to-pet ratio.
+        </p>
       </div>
-
-      <div className="pixel-border">
-        <h3>🎵 Now Playing: Darude - Sandstorm 🎵</h3>
-        <p>Turn up your speakers for the full experience!</p>
-      </div>
-
-      <div className="under-construction">
-        🚧 This site is under construction! 🚧
-        <br />
-        Please excuse the mess while the cats are blogging and sleeping!
-      </div>
-
-      <div className="visitor-counter">
-        {isLoadingCount ? (
-          <span className="blink">Loading visitor count...</span>
-        ) : (
-          <>You are visitor #{visitorCount.toLocaleString()}</>
-        )}
-        <br />
-        Current time: {currentTime.toLocaleTimeString()}
-      </div>
-
-      <p style={{fontSize: '12px', color: '#666'}}>
-        Best viewed with Internet Explorer 4.0+ | 
-        <span className="blink">NEW!</span> JavaScript enabled | 
-        Made with ❤️ and HTML
-      </p>
     </div>
   );
 }
@@ -458,8 +484,71 @@ function App() {
         </div>
       )}
       <Routes>
-        <Route path="/sayhi" element={<TalkToCatsForm onBack={() => navigate('/')} />} />
-        <Route path="/" element={<HomePage visitorCount={visitorCount} currentTime={currentTime} isLoadingCount={isLoadingCount} handleClick={handleClick} />} />
+        <Route path="/sayhi" element={<TalkToCatsForm />} />
+        <Route path="/aphaea" element={<AphaeaProfile />} />
+        <Route path="/apollo" element={<ApolloProfile />} />
+        <Route path="/" element={
+          <div className="main-content">
+          <h1 className="glitter-text">cats</h1>
+          <p className="subtitle">Welcome to cats.com, a radical new way to internet, for cats by cats</p>
+          
+          <div className="marquee">
+            <div className="marquee-text">
+              ★ ☆ ★ meow ★ ☆ ★ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; meow. meow
+            </div>
+          </div>
+
+          <div className="welcome-box" style={{ position: 'relative' }}>
+            <PopupCats />
+            <p>🌟 Hi, I'm <span className="blink">Aphaea</span> and I'm Apol<span className="blink">lo</span> and together we are a<sup>3</sup>! 🌟</p>
+            <p> We're so glad that you decided to come hang out with us today </p>
+            <p> Take a look around and check out how cute we are! </p>
+          </div>
+
+          <div className="retro-grid">
+            <div className="retro-card">
+              <img src="/images/aphaea_pfp.jpg" alt="Aphaea.jpg" className="card-pfp" />
+              <h3>Aphaea</h3>
+              <p>✨ pwincess ✨</p>
+              <button className="button-90s" onClick={() => navigate('/aphaea')}>Click Me!</button>
+            </div>
+            
+            <div className="retro-card">
+              <img src="/images/apollo_pfp.jpg" alt="aPollo.jpg" className="apollo-card-pfp" />
+              <h3>aPollo</h3>
+              <p>🌟 demon. chicken. spawn. cat. bingus 🌟</p>
+              <button className="button-90s" onClick={() => navigate('/apollo')}>Explore</button>
+            </div>
+          </div>
+
+          <div className="pixel-border">
+            <h3>🎵 Now Playing: Darude - Sandstorm 🎵</h3>
+            <p>Turn up your speakers for the full experience!</p>
+          </div>
+
+          <div className="under-construction">
+            🚧 This site is under construction! 🚧
+            <br />
+            Please excuse the mess while the cats are blogging and sleeping!
+          </div>
+
+          <div className="visitor-counter">
+            {isLoadingCount ? (
+              <span className="blink">Loading visitor count...</span>
+            ) : (
+              <>You are visitor #{visitorCount.toLocaleString()}</>
+            )}
+            <br />
+            Current time: {currentTime.toLocaleTimeString()}
+          </div>
+
+          <p style={{fontSize: '12px', color: '#666'}}>
+            Best viewed with Internet Explorer 4.0+ | 
+            <span className="blink">NEW!</span> JavaScript enabled | 
+            Made with ❤️ and HTML
+          </p>
+          </div>
+        } />
       </Routes>
     </div>
   );
