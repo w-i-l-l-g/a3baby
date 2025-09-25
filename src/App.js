@@ -211,9 +211,131 @@ function FlyingCats() {
   );
 }
 
+// Form Submission Component
+function TalkToCatsForm({ onBack }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Validate message field is required
+    if (!formData.message) {
+      return; // Do nothing if no message
+    }
+    
+    setSubmitting(true);
+    
+    // Submit to the API endpoint
+    fetch('https://jfumnb3gqn2yzfj23fonxed6w40jmoww.lambda-url.us-east-1.on.aws/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message
+      }),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      setFormData({ name: '', email: '', message: '' });
+      setSubmitting(false);
+      setSuccess(true);
+      
+      // Show "Meow!" for 1.5 seconds then go back
+      setTimeout(() => {
+        onBack();
+      }, 1250);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      setSubmitting(false);
+    });
+  };
+
+  return (
+    <div className="form-container">
+      {success ? (
+        <h2 className="meow-message">Meow!</h2>
+      ) : (
+        <>
+          <h2 className="form-title glitter-text">Talk to Cats</h2>
+          <div className="retro-form">
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="name">Name (optional):</label>
+                <input 
+                  type="text" 
+                  id="name" 
+                  name="name" 
+                  value={formData.name} 
+                  onChange={handleInputChange} 
+                  className="retro-input"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="email">Email (optional):</label>
+                <input 
+                  type="text" 
+                  id="email" 
+                  name="email" 
+                  value={formData.email} 
+                  onChange={handleInputChange} 
+                  className="retro-input"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="message">Message:</label>
+                <textarea 
+                  id="message" 
+                  name="message" 
+                  value={formData.message} 
+                  onChange={handleInputChange} 
+                  className="retro-textarea" 
+                  required
+                  rows="5"
+                />
+              </div>
+              
+              <div className="form-actions">
+                <button type="submit" className="button-90s">{submitting ? 'Sending...' : 'Send to Cats'}</button>
+                <button type="button" onClick={onBack} className="button-90s back-button">Go Back</button>
+              </div>
+            </form>
+          </div>
+          
+          <div className="cat-corner">
+            <img src="/images/cat3.png" alt="Cat listening" className="center-cat" />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function App() {
   const [visitorCount, setVisitorCount] = useState(1337);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -225,66 +347,78 @@ function App() {
   const handleClick = () => {
     setVisitorCount(prev => prev + 1);
   };
+  
+  const toggleForm = () => {
+    setShowForm(prev => !prev);
+  };
 
   return (
     <div className="App">
       <FlyingCats />
-      <div className="main-content">
-        <h1 className="glitter-text">cats</h1>
-        <p className="subtitle">Welcome to cats.com, a radical new way to internet, for cats by cats</p>
-        
-        <div className="marquee">
-          <div className="marquee-text">
-            ★ ☆ ★ meow ★ ☆ ★ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; meow. meow
-          </div>
-        </div>
-
-        <div className="welcome-box" style={{ position: 'relative' }}>
-          <PopupCats />
-          <p>🌟 Hi, I'm <span className="blink">Aphaea</span> and I'm Apol<span className="blink">lo</span> and together we are a<sup>3</sup>! 🌟</p>
-          <p> We're so glad that you decided to come hang out with us today </p>
-          <p> Take a look around and check out how cute we are! </p>
-        </div>
-
-        <div className="retro-grid">
-          <div className="retro-card">
-            <img src="/images/aphaea_pfp.jpg" alt="Aphaea.jpg" className="card-pfp" />
-            <h3>Aphaea</h3>
-            <p>✨ pwincess ✨</p>
-            <button className="button-90s" onClick={handleClick}>Click Here!</button>
+      {showForm ? (
+        <TalkToCatsForm onBack={toggleForm} />
+      ) : (
+        <div className="main-content">
+          <h1 className="glitter-text">cats</h1>
+          <p className="subtitle">Welcome to cats.com, a radical new way to internet, for cats by cats</p>
+          
+          <div className="nav-link">
+            <a href="#" className="talk-cats-link" onClick={(e) => { e.preventDefault(); toggleForm(); }}>talk to cats</a>
           </div>
           
-          <div className="retro-card">
-            <img src="/images/apollo_pfp.jpg" alt="aPollo.jpg" className="apollo-card-pfp" />
-            <h3>aPollo</h3>
-            <p>🌟 demon. chicken. spawn. cat. bingus 🌟</p>
-            <button className="button-90s">Explore</button>
+          <div className="marquee">
+            <div className="marquee-text">
+              ★ ☆ ★ meow ★ ☆ ★ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; meow. meow
+            </div>
           </div>
-        </div>
 
-        <div className="pixel-border">
-          <h3>🎵 Now Playing: Darude - Sandstorm 🎵</h3>
-          <p>Turn up your speakers for the full experience!</p>
-        </div>
+          <div className="welcome-box" style={{ position: 'relative' }}>
+            <PopupCats />
+            <p>🌟 Hi, I'm <span className="blink">Aphaea</span> and I'm Apol<span className="blink">lo</span> and together we are a<sup>3</sup>! 🌟</p>
+            <p> We're so glad that you decided to come hang out with us today </p>
+            <p> Take a look around and check out how cute we are! </p>
+          </div>
 
-        <div className="under-construction">
-          🚧 This site is under construction! 🚧
-          <br />
-          Please excuse the mess while the cats are blogging and sleeping!
-        </div>
+          <div className="retro-grid">
+            <div className="retro-card">
+              <img src="/images/aphaea_pfp.jpg" alt="Aphaea.jpg" className="card-pfp" />
+              <h3>Aphaea</h3>
+              <p>✨ pwincess ✨</p>
+              <button className="button-90s" onClick={handleClick}>Click Here!</button>
+            </div>
+            
+            <div className="retro-card">
+              <img src="/images/apollo_pfp.jpg" alt="aPollo.jpg" className="apollo-card-pfp" />
+              <h3>aPollo</h3>
+              <p>🌟 demon. chicken. spawn. cat. bingus 🌟</p>
+              <button className="button-90s">Explore</button>
+            </div>
+          </div>
 
-        <div className="visitor-counter">
-          You are visitor #{visitorCount.toLocaleString()}
-          <br />
-          Current time: {currentTime.toLocaleTimeString()}
-        </div>
+          <div className="pixel-border">
+            <h3>🎵 Now Playing: Darude - Sandstorm 🎵</h3>
+            <p>Turn up your speakers for the full experience!</p>
+          </div>
 
-        <p style={{fontSize: '12px', color: '#666'}}>
-          Best viewed with Internet Explorer 4.0+ | 
-          <span className="blink">NEW!</span> JavaScript enabled | 
-          Made with ❤️ and HTML
-        </p>
-      </div>
+          <div className="under-construction">
+            🚧 This site is under construction! 🚧
+            <br />
+            Please excuse the mess while the cats are blogging and sleeping!
+          </div>
+
+          <div className="visitor-counter">
+            You are visitor #{visitorCount.toLocaleString()}
+            <br />
+            Current time: {currentTime.toLocaleTimeString()}
+          </div>
+
+          <p style={{fontSize: '12px', color: '#666'}}>
+            Best viewed with Internet Explorer 4.0+ | 
+            <span className="blink">NEW!</span> JavaScript enabled | 
+            Made with ❤️ and HTML
+          </p>
+        </div>
+      )}
     </div>
   );
 }
