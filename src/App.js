@@ -200,7 +200,7 @@ function FlyingCats() {
             top: `${cat.y}px`,
             transform: `rotate(${cat.rotation}deg) scale(${cat.scale})`,
             pointerEvents: 'none',
-            zIndex: 1000,
+            zIndex: 1100, /* Increased to ensure cats fly over button */
             width: '100px',
             height: 'auto',
             filter: 'drop-shadow(0 0 10px rgba(255, 105, 180, 0.5))'
@@ -355,16 +355,17 @@ function App() {
   return (
     <div className="App">
       <FlyingCats />
+      {!showForm && (
+        <div className="corner-nav">
+          <a href="#" className="talk-cats-link" onClick={(e) => { e.preventDefault(); toggleForm(); }}>talk to cats</a>
+        </div>
+      )}
       {showForm ? (
         <TalkToCatsForm onBack={toggleForm} />
       ) : (
         <div className="main-content">
           <h1 className="glitter-text">cats</h1>
           <p className="subtitle">Welcome to cats.com, a radical new way to internet, for cats by cats</p>
-          
-          <div className="nav-link">
-            <a href="#" className="talk-cats-link" onClick={(e) => { e.preventDefault(); toggleForm(); }}>talk to cats</a>
-          </div>
           
           <div className="marquee">
             <div className="marquee-text">
