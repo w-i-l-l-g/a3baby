@@ -54,7 +54,7 @@ body {
 .main-content {
   position: relative;
   z-index: 2;
-  background: rgba(255, 182, 193, 0.9);
+  background: #ffb3c2;
   border: 4px outset #ffb6c1;
   margin: 20px auto;
   max-width: 800px;
@@ -326,4 +326,128 @@ h1 {
   border: 2px inset #c0c0c0;
   margin: 20px 0;
   font-size: 14px;
+}
+
+.nav-link {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.corner-nav {
+  position: fixed;
+  top: 5px;
+  right: 24px; /* Position it further to the right so part of it is under the main content */
+  z-index: 1; /* Lower z-index than main-content (which is 2) */
+}
+
+.talk-cats-link {
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+  text-shadow: 1px 1px 2px #ff69b4;
+  letter-spacing: 1px;
+  position: relative;
+  background-color: #ff1493;
+  padding: 15px 20px;
+  padding: 8px 20px 15px 20px;
+/* top | right | bottom | left */
+  border-radius: 10px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.8), 
+              inset 0 0 5px rgba(255, 255, 255, 0.5);
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.talk-cats-link::before {
+  content: '★ ';
+}
+
+.talk-cats-link::after {
+  content: ' ★';
+}
+
+.talk-cats-link:hover {
+  color: white;
+  transform: scale(1.03);
+  box-shadow: 0 0 15px rgba(255, 105, 180, 1.0),
+              inset 0 0 10px rgba(255, 255, 255, 0.8);
+  animation: sparkleLink 0.5s infinite alternate;
+}
+
+.talk-cats-link:active {
+  color: #ffe4e1;
+  transform: rotate(0deg) scale(0.98);
+  box-shadow: 0 0 5px rgba(255, 105, 180, 0.5),
+              inset 0 0 5px rgba(255, 20, 147, 0.5);
+}
+
+@keyframes sparkleLink {
+  0% { text-shadow: 1px 1px 2px #ffb6c1; }
+  100% { text-shadow: 0 0 8px #ff69b4, 0 0 15px #ff1493; }
+}
+
+/* Form Styles - extremely minimal */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-title {
+  color: #ff1493;
+}
+
+.form-group {
+  margin: 5px 0;
+}
+
+.retro-input,
+.retro-textarea {
+  font-family: 'Courier New', monospace;
+  width: 175px;
+}
+
+.retro-textarea {
+  height: 100px;
+}
+
+.form-actions {
+  margin-top: 15px;
+}
+
+.back-button {
+  margin-left: 10px;
+}
+
+.cat-corner {
+  position: static;
+  width: 70px;
+  margin-top: 20px;
+}
+
+.center-cat {
+  position: static;
+  width: 175px;
+  margin-top: 20px;
+  margin-left: -33px;
+}
+
+.meow-message {
+  font-size: 60px;
+  color: white;
+  text-align: center;
+  margin-top: 100px;
+  font-family: 'Courier New', monospace;
+  text-shadow: 
+    2px 2px 0px #ffffff,
+    4px 4px 0px #ff69b4,
+    6px 6px 8px rgba(255, 20, 147, 0.6),
+    0 0 10px rgba(255, 105, 180, 0.8),
+    0 0 20px rgba(255, 20, 147, 0.6);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: sparkleText 1.5s ease-in-out infinite;
 }
